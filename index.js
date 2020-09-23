@@ -11,8 +11,8 @@ const axios = require("axios").default;
 const package = require("./package.json");
 
 program
-  .version(package.version)
   .name(package.name)
+  .version(package.version)
   .requiredOption("-d, --dagId <dagId>")
   .requiredOption("-r, --runId <runId>")
   .requiredOption(
@@ -21,6 +21,7 @@ program
     "http://192.168.0.229:8081"
   )
   .option("-f --toFile", "是否将结果写入到文件中，默认是打印到stdout")
+  .option("-o --openInBrowser", "是否在浏览器里面打开对应的airflow web页面")
   .option(
     "-i --keepInfo",
     "是否需要保留airflow日志里面的INFO行，默认是过滤掉INFO行"
@@ -41,6 +42,7 @@ assert(baseURL, "baseURL is falsy");
 
 const TO_FILE = Boolean(program.toFile);
 const KEEP_INFO = Boolean(program.keepInfo);
+const OPEN_IN_BROWSER = Boolean(program.openInBrowser);
 
 const http = axios.create({ baseURL });
 
@@ -87,7 +89,6 @@ async function getDagRunLog(dagId, taskId, execution_date) {
     lines = lines.slice(0, smartEnd);
   }
   content = lines.join("\n");
-
   if (TO_FILE) {
     const reportDir = path.join(__dirname, "reports");
     await fs.ensureDir(reportDir);
@@ -98,6 +99,16 @@ async function getDagRunLog(dagId, taskId, execution_date) {
     opn(filePath);
   } else {
     console.log(content);
+  }
+
+  const webUrl =
+    baseURL +
+    `/admin/airflow/graph?dag_id=${dagId}&execution_date=${encodeURIComponent(
+      execution_date
+    )}`;
+
+  if (OPEN_IN_BROWSER) {
+    opn(webUrl);
   }
 }
 
