@@ -1,6 +1,10 @@
+    npm i -g airflow-log
+
+use:
+
 ```
 
-Usage: index [options]
+Usage: airflow [options]
 
 Options:
   -V, --version            output the version number
