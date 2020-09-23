@@ -12,6 +12,7 @@ const package = require("./package.json");
 
 program
   .version(package.version)
+  .name(package.name)
   .requiredOption("-d, --dagId <dagId>")
   .requiredOption("-r, --runId <runId>")
   .requiredOption(
