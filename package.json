@@ -10,6 +10,9 @@
         "airflow": "./index.js"
     },
     "author": "",
+    "repository": {
+        "url": "https://github.com/foresightyj/airflow-log-cli"
+    },
     "license": "ISC",
     "dependencies": {
         "axios": "^0.20.0",
