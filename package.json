@@ -1,13 +1,13 @@
 {
     "name": "airflow-log",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "bin": {
-        "airflow": "./index.js"
+        "airflow-log": "./index.js"
     },
     "author": "",
     "repository": {

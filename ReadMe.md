@@ -4,7 +4,7 @@ use:
 
 ```
 
-Usage: airflow [options]
+Usage: airflow-log [options]
 
 Options:
   -V, --version            output the version number
