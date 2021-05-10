@@ -1,11 +1,11 @@
 {
     "name": "airflow-log",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "description": "",
     "main": "index.js",
     "scripts": {},
     "bin": {
-        "airflow-log": "./index.js"
+        "airflow-log": "./cli.js"
     },
     "author": "",
     "repository": {
@@ -25,7 +25,10 @@
     },
     "devDependencies": {
         "@types/axios": "^0.14.0",
+        "@types/fs-extra": "^9.0.11",
+        "@types/lodash": "^4.14.168",
         "@types/opn": "^5.5.0",
+        "@types/shelljs": "^0.8.8",
         "shelljs": "^0.8.4"
     }
 }
