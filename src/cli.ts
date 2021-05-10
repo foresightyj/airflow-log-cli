@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 //@ts-check
-const path = require("path");
-const _ = require("lodash");
-const shelljs = require("shelljs");
-const opn = require("opn");
-const fs = require("fs-extra");
-const program = require("commander");
-const pkg = require("./package.json");
-const assert = require("assert");
-const { AirflowLog } = require(".");
+import path from "path";
+import _ from "lodash";
+import shelljs from "shelljs";
+import opn from "opn";
+import fs from "fs-extra";
+import program from "commander";
+import assert from "assert";
+import { AirflowLog } from ".";
+import { DagTask } from "./DagTask";
+
+const pkg = require("../package.json");
 
 program
     .name(pkg.name)
@@ -23,36 +25,23 @@ program
     .option("-f --toFile", "是否将结果写入到文件中，默认是打印到stdout")
     .option("-o --openInBrowser", "是否在浏览器里面打开对应的airflow web页面")
     .option("-a --avajsStat", "是否统计avajs结果")
-    //   .option(
-    //     "-i --keepInfo",
-    //     "是否需要保留airflow日志里面的INFO行，默认是过滤掉INFO行"
-    //   )
     .parse(process.argv);
 
-/** @type {string} */
-const dagId = program.dagId;
+const dagId = program.dagId as string;
 assert(dagId, "dagId is falsy");
 
-/** @type {string} */
-const taskId = program.taskId;
+const taskId = program.taskId as string;
 assert(taskId, "taskId is falsy");
 
-/** @type {string} */
-const baseURL = program.baseUrl;
+const baseURL = program.baseUrl as string;
 assert(baseURL, "baseURL is falsy");
 
 const TO_FILE = Boolean(program.toFile);
 const AVAJS_STAT = Boolean(program.avajsStat);
-// const KEEP_INFO = Boolean(program.keepInfo);
 const OPEN_IN_BROWSER = Boolean(program.openInBrowser);
 
 
-/**
- * @param {AirflowLog} airflowLog
- * @param {TaskInstance} task
- * @param {string} runId
- */
-async function getTaskLog(airflowLog, task, runId) {
+async function analyzeLog(airflowLog: AirflowLog, task: DagTask, runId: string) {
     const data = await airflowLog.getTaskLog(task, runId);
     let lines = data.split("\n");
     lines = lines.filter((l) => !l.includes(": Subtask "));
@@ -70,11 +59,7 @@ async function getTaskLog(airflowLog, task, runId) {
 
         if (AVAJS_STAT) {
             let deltaSeconds = 0;
-            /**
-             * @param {string} s
-             * @returns {Date}
-             */
-            function parseTime(s) {
+            function parseTime(s: string): Date {
                 const t = s.split("]")[0].substr(1);
                 return new Date(t.split(",")[0]);
             }
@@ -130,9 +115,7 @@ Finished: ${completed}, Time Taken ${deltaSeconds} seconds
     const dag = await airflowLog.getLatestRunOfDag(dagId);
     assert(dag.execution_date, "execution_date is falsy");
     const task = await airflowLog.getTaskInstance(dag, taskId);
-    const log = await airflowLog.getTaskLog(task, dag.dag_run_id);
-
     console.log("===================== AIRFLOW LOG BEGIN =====================");
-    console.log(log);
+    await analyzeLog(airflowLog, task, dag.dag_run_id);
     console.log("===================== AIRFLOW LOG END =====================");
 })();

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-const assert = require("assert");
-const axios = require("axios").default;
+import assert from "assert"
+import axios, { AxiosInstance } from "axios";
+import { DagRun } from "./DagRun";
+import { DagTask } from "./DagTask";
 
-class AirflowLog {
-    /**
-     * @param {string} baseUrl 
-     */
-    constructor(baseUrl) {
+export class AirflowLog {
+    private http: AxiosInstance;
+    constructor(baseUrl: string) {
         this.http = axios.create({
             baseURL: baseUrl,
             auth: {
@@ -17,11 +17,7 @@ class AirflowLog {
         });
     }
 
-    /**
-     * @param {string} dagId
-     * @returns {Promise<DagRun>}
-     */
-    async getLatestRunOfDag(dagId) {
+    async getLatestRunOfDag(dagId: string): Promise<DagRun> {
         const res = await this.http.get(`/api/v1/dags/${dagId}/dagRuns`, {
             params: {
                 limit: 1,
@@ -30,41 +26,24 @@ class AirflowLog {
         });
         const d = res.data;
         assert.strictEqual(res.status, 200, `get latest_runs returned ${res.status}`);
-        /** @type {DagRun} */
-        const dag = d.dag_runs[0]
+        const dag = d.dag_runs[0] as DagRun
         assert(dag.dag_id, "dag_id is falsy");
         return dag;
     }
 
-    /**
-     * @param {DagRun} dagRun
-     * @param {string} taskId
-     * @returns {Promise<TaskInstance>}
-     */
-    async getTaskInstance(dagRun, taskId) {
+    async getTaskInstance(dagRun: DagRun, taskId: string): Promise<DagTask> {
         const url = `/api/v1/dags/${dagRun.dag_id}/dagRuns/${dagRun.dag_run_id}/taskInstances`
         const res = await this.http.get(url);
         const data = res.data;
-        const task = data.task_instances.find(inst => inst.task_id === taskId);
+        const task = data.task_instances.find((inst: { task_id: string; }) => inst.task_id === taskId);
         return task;
     }
 
-    /**
-     * @param {TaskInstance} task
-     * @param {string} runId
-     * @returns {Promise<string>}
-     */
-    async getTaskLog(task, runId) {
+    async getTaskLog(task: DagTask, runId: string): Promise<string> {
         const url = `/api/v1/dags/${task.dag_id}/dagRuns/${runId}/taskInstances/${task.task_id}/logs/${task.try_number}`
         const res = await this.http.get(url);
-        const data = res.data;
-        /** @type {string} */
+        const data = res.data as string;
         assert(typeof data === "string", "data not string");
         return data;
     }
-}
-
-
-module.exports = {
-    AirflowLog,
 }
