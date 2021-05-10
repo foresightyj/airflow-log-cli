@@ -53,7 +53,7 @@ async function analyzeLog(airflowLog: AirflowLog, task: DagTask, runId: string) 
     if (TO_FILE) {
         console.log(firstLine, lastLine, content);
         const reportDir = path.join(__dirname, "reports");
-        const filePath = path.join(reportDir, `${task.task_id}.log`);
+        const filePath = path.join(reportDir, `${task.dag_id}_${task.task_id}.log`);
         await fs.outputFile(filePath, content, { encoding: "utf-8", });
         opn(filePath);
 
