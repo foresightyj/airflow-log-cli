@@ -1,8 +1,8 @@
 {
     "name": "airflow-log",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "description": "",
-    "main": "index.js",
+    "main": "./build/index.js",
     "scripts": {
         "ts": "tsc -w",
         "build": "tsc"
